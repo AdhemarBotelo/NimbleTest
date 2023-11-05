@@ -39,7 +39,7 @@ import com.adhemar.nimble.R
 
 @Composable
 fun SecurityScreen(
-    viewModel: SecurityViewModel = hiltViewModel(),
+    viewModel: SecurityViewModel,
     navHostController: NavHostController
 ) {
     Login(navHostController = navHostController)

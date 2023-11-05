@@ -103,6 +103,12 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.android.compiler)
 
+    //retrofit
+    implementation(libs.retrofit)
+
+    //gson
+    implementation(libs.converter.gson)
+
     // Arch Components
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
