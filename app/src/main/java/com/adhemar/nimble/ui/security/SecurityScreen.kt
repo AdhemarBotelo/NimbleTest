@@ -1,28 +1,19 @@
-/*
- * Copyright (C) 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.adhemar.nimble.ui.security
 
-import com.adhemar.nimble.ui.theme.MyApplicationTheme
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,48 +22,98 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.adhemar.nimble.R
 
 @Composable
-fun SecurityScreen(modifier: Modifier = Modifier, viewModel: SecurityViewModel = hiltViewModel()) {
-    val items by viewModel.uiState.collectAsStateWithLifecycle()
-    if (items is SecurityUiState.Success) {
-        SecurityScreen(
-            items = (items as SecurityUiState.Success).data,
-            onSave = viewModel::addSecurity,
-            modifier = modifier
-        )
-    }
+fun SecurityScreen(
+    viewModel: SecurityViewModel = hiltViewModel(),
+    navHostController: NavHostController
+) {
+    Login(navHostController = navHostController)
 }
 
 @Composable
-internal fun SecurityScreen(
-    items: List<String>,
-    onSave: (name: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier) {
-        var nameSecurity by remember { mutableStateOf("Compose") }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+fun Login(navHostController: NavHostController) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x99000000))
+                .align(Alignment.Center)
         ) {
-            TextField(
-                value = nameSecurity,
-                onValueChange = { nameSecurity = it }
-            )
+            Column(
+                modifier = Modifier
+                    .padding(16.dp, 16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
 
-            Button(modifier = Modifier.width(96.dp), onClick = { onSave(nameSecurity) }) {
-                Text("Save")
+            ) {
+                var email by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_logo_white),
+                    contentDescription = null,
+                    Modifier
+                        .wrapContentSize()
+                        .height(48.dp)
+                        .width(200.dp),
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                TextField(
+                    value = email, onValueChange = { email = it },
+                    placeholder = { Text(text = stringResource(R.string.email), color = Color.Gray) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+                TextField(
+                    label = { Text(text = stringResource(R.string.password), color = Color.Gray) },
+                    value = password,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    onValueChange = { password = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Box() {
+                    Button(
+                        onClick = { },
+                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(text = stringResource(R.string.login))
+                    }
+                }
             }
         }
-        items.forEach {
-            Text("Saved item: $it")
-        }
+
     }
 }
 
@@ -80,16 +121,7 @@ internal fun SecurityScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun DefaultPreview() {
-    MyApplicationTheme {
-        SecurityScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
-    }
+fun LoginPreview() {
+    Login(rememberNavController())
 }
 
-@Preview(showBackground = true, widthDp = 480)
-@Composable
-private fun PortraitPreview() {
-    MyApplicationTheme {
-        SecurityScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
-    }
-}

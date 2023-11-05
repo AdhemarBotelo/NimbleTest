@@ -16,15 +16,15 @@
 
 package com.adhemar.nimble.ui
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.adhemar.nimble.ui.home.HomeScreen
 import com.adhemar.nimble.ui.security.SecurityScreen
+import com.adhemar.nimble.ui.security.SecurityViewModel
 
 @Composable
 fun MainNavigation() {
@@ -33,9 +33,10 @@ fun MainNavigation() {
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
         composable(AppScreens.SplashScreen.route) { SplashScreen(navController) }
         composable(AppScreens.MainScreen.route) { (HomeScreen()) }
-        composable(AppScreens.LoginScreen.route) { SecurityScreen() }
-
-
+        composable(AppScreens.LoginScreen.route) {
+            val viewModel:SecurityViewModel = hiltViewModel()
+            SecurityScreen(viewModel,navController)
+        }
     }
 }
 
