@@ -103,6 +103,16 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.android.compiler)
 
+    //retrofit
+    implementation(libs.retrofit)
+
+    //dataStore
+    implementation(libs.datastore)
+    implementation(libs.datastore.preferences)
+
+    //gson
+    implementation(libs.converter.gson)
+
     // Arch Components
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -116,6 +126,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Instrumented tests

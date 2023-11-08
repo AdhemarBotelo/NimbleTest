@@ -17,6 +17,7 @@
 package com.adhemar.nimble.data.local.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
@@ -24,18 +25,23 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Entity
-data class Security(
-    val name: String
+data class SurveyDB(
+    val title: String,
+    @PrimaryKey val id: String,
+    val description:String,
+    val backgroundImageUrl:String
 ) {
-    @PrimaryKey(autoGenerate = true)
-    var uid: Int = 0
+
 }
 
 @Dao
-interface SecurityDao {
-    @Query("SELECT * FROM security ORDER BY uid DESC LIMIT 10")
-    fun getSecuritys(): Flow<List<Security>>
+interface SurveyDao {
+    @Query("SELECT * FROM SurveyDB ORDER BY id")
+    fun getSurveys(): Flow<List<SurveyDB>>
 
     @Insert
-    suspend fun insertSecurity(item: Security)
+    suspend fun insertSurvey(item: SurveyDB)
+
+    @Query("DELETE FROM SurveyDB")
+    suspend fun deleteAllSurvey()
 }

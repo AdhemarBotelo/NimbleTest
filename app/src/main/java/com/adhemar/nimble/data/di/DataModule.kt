@@ -16,14 +16,24 @@
 
 package com.adhemar.nimble.data.di
 
+import com.adhemar.nimble.data.DefaultSecurityRepository
+import com.adhemar.nimble.data.ISurveyRepository
+import com.adhemar.nimble.data.SecurityRepository
+import com.adhemar.nimble.data.SurveyRepository
+import com.adhemar.nimble.data.local.database.SurveyDB
+import com.adhemar.nimble.data.network.ApiResponse
+import com.adhemar.nimble.data.network.model.LogInResponse
+import com.adhemar.nimble.data.network.model.LoginRequest
+import com.adhemar.nimble.data.network.model.OauthToken
+import com.adhemar.nimble.data.network.model.OauthTokenAtribute
+import com.adhemar.nimble.data.network.model.RefreshTokenRequest
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import com.adhemar.nimble.data.SecurityRepository
-import com.adhemar.nimble.data.DefaultSecurityRepository
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,14 +46,69 @@ interface DataModule {
     fun bindsSecurityRepository(
         securityRepository: DefaultSecurityRepository
     ): SecurityRepository
+
+    @Singleton
+    @Binds
+    fun bindSurveyRepository(
+        surveyRepository: SurveyRepository
+    ): ISurveyRepository
 }
 
 class FakeSecurityRepository @Inject constructor() : SecurityRepository {
-    override val securitys: Flow<List<String>> = flowOf(fakeSecuritys)
+    override fun login(loginRequest: LoginRequest): Flow<ApiResponse<LogInResponse>> {
+        return flow {
+            emit(ApiResponse.Success(
+                LogInResponse(
+                data = OauthToken(
+                    id ="id",
+                    type = "type",
+                    attributes = OauthTokenAtribute(
+                        accessToken = "1234135dsafasdf",
+                        tokenType = "type",
+                        expiresIn = 8000,
+                        refreshToken = "asdfadf1234asdf",
+                        createdAt = 10000,
+                    )
 
-    override suspend fun add(name: String) {
-        throw NotImplementedError()
+                )
+            )
+            ))
+        }
     }
+
+    override fun refreshToken(refreshTokenRequest: RefreshTokenRequest): Flow<ApiResponse<LogInResponse>> {
+        return flow {
+            emit(ApiResponse.Success(
+                LogInResponse(
+                    data = OauthToken(
+                        id ="id",
+                        type = "type",
+                        attributes = OauthTokenAtribute(
+                            accessToken = "1234135dsafasdf",
+                            tokenType = "type",
+                            expiresIn = 8000,
+                            refreshToken = "asdfadf1234asdf",
+                            createdAt = 10000,
+                        )
+
+                    )
+                )
+            ))
+        }
+    }
+}
+
+class FakeSurveryRepository @Inject constructor(): ISurveyRepository {
+    override fun getSurveys(coroutineScope: CoroutineScope): Flow<ApiResponse<Boolean>> {
+        TODO("Not yet implemented")
+    }
+
+
+    override fun getSurveysFromDB(): Flow<List<SurveyDB>> {
+        TODO("Not yet implemented")
+    }
+
+
 }
 
 val fakeSecuritys = listOf("One", "Two", "Three")
