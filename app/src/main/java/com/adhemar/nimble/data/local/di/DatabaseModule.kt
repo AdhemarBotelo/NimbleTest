@@ -24,7 +24,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import com.adhemar.nimble.data.local.database.AppDatabase
-import com.adhemar.nimble.data.local.database.SecurityDao
+import com.adhemar.nimble.data.local.database.SurveyDao
 import javax.inject.Singleton
 
 
@@ -32,8 +32,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
     @Provides
-    fun provideSecurityDao(appDatabase: AppDatabase): SecurityDao {
-        return appDatabase.securityDao()
+    fun provideSurveyDao(appDatabase: AppDatabase): SurveyDao {
+        return appDatabase.surveyDao()
     }
 
     @Provides
@@ -42,7 +42,7 @@ class DatabaseModule {
         return Room.databaseBuilder(
             appContext,
             AppDatabase::class.java,
-            "Security"
+            "Survey"
         ).build()
     }
 }

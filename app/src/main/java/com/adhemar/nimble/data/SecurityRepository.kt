@@ -17,25 +17,33 @@
 package com.adhemar.nimble.data
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import com.adhemar.nimble.data.local.database.Security
-import com.adhemar.nimble.data.local.database.SecurityDao
+import com.adhemar.nimble.data.network.ApiResponse
+import com.adhemar.nimble.data.network.AuthApiService
+import com.adhemar.nimble.data.network.apiRequestFlow
+import com.adhemar.nimble.data.network.model.LogInResponse
+import com.adhemar.nimble.data.network.model.LoginRequest
+import com.adhemar.nimble.data.network.model.RefreshTokenRequest
 import javax.inject.Inject
 
 interface SecurityRepository {
-    val securitys: Flow<List<String>>
 
-    suspend fun add(name: String)
+    fun login(loginRequest: LoginRequest):Flow<ApiResponse<LogInResponse>>
+
+    fun refreshToken(refreshTokenRequest: RefreshTokenRequest):Flow<ApiResponse<LogInResponse>>
 }
 
 class DefaultSecurityRepository @Inject constructor(
-    private val securityDao: SecurityDao
+    private val authApiService: AuthApiService
 ) : SecurityRepository {
+    override fun login(loginRequest: LoginRequest): Flow<ApiResponse<LogInResponse>> {
+        return apiRequestFlow {
+            authApiService.logIn(loginRequest)
+        }
+    }
 
-    override val securitys: Flow<List<String>> =
-        securityDao.getSecuritys().map { items -> items.map { it.name } }
-
-    override suspend fun add(name: String) {
-        securityDao.insertSecurity(Security(name = name))
+    override fun refreshToken(refreshTokenRequest: RefreshTokenRequest): Flow<ApiResponse<LogInResponse>> {
+        return apiRequestFlow {
+            authApiService.refreshToken(refreshTokenRequest)
+        }
     }
 }

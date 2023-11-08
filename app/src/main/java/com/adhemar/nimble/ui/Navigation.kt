@@ -16,32 +16,36 @@
 
 package com.adhemar.nimble.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.adhemar.nimble.ui.home.HomeScreen
+import com.adhemar.nimble.ui.home.HomeViewModel
 import com.adhemar.nimble.ui.security.SecurityScreen
 import com.adhemar.nimble.ui.security.SecurityViewModel
 
 @Composable
-fun MainNavigation() {
+fun MainNavigation(context: Context) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
         composable(AppScreens.SplashScreen.route) { SplashScreen(navController) }
-        composable(AppScreens.MainScreen.route) { (HomeScreen()) }
+        composable(AppScreens.MainScreen.route) {
+            val viewModel:HomeViewModel = hiltViewModel()
+            (HomeScreen(navController, viewModel =viewModel , context = context))
+        }
         composable(AppScreens.LoginScreen.route) {
-            val viewModel:SecurityViewModel = hiltViewModel()
-            SecurityScreen(viewModel,navController)
+            val viewModel: SecurityViewModel = hiltViewModel()
+            SecurityScreen(viewModel, navController, context)
         }
     }
 }
 
-sealed class AppScreens(val route:String){
-    data object SplashScreen: AppScreens("splash_screen")
-    data object MainScreen: AppScreens("main_screen")
-    data object LoginScreen:AppScreens("login_screen")
+sealed class AppScreens(val route: String) {
+    data object SplashScreen : AppScreens("splash_screen")
+    data object MainScreen : AppScreens("main_screen")
+    data object LoginScreen : AppScreens("login_screen")
 }

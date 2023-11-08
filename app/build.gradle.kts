@@ -106,6 +106,10 @@ dependencies {
     //retrofit
     implementation(libs.retrofit)
 
+    //dataStore
+    implementation(libs.datastore)
+    implementation(libs.datastore.preferences)
+
     //gson
     implementation(libs.converter.gson)
 
@@ -122,6 +126,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Instrumented tests

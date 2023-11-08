@@ -18,38 +18,65 @@ package com.adhemar.nimble.ui.security
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import com.adhemar.nimble.data.SecurityRepository
+import com.adhemar.nimble.data.network.ApiResponse
+import com.adhemar.nimble.data.network.TokenManager
+import com.adhemar.nimble.data.network.model.LoginRequest
 import com.adhemar.nimble.ui.security.SecurityUiState.Error
 import com.adhemar.nimble.ui.security.SecurityUiState.Loading
 import com.adhemar.nimble.ui.security.SecurityUiState.Success
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SecurityViewModel @Inject constructor(
-    private val securityRepository: SecurityRepository
+    private val securityRepository: SecurityRepository,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
 
-    val uiState: StateFlow<SecurityUiState> = securityRepository
-        .securitys.map<List<String>, SecurityUiState>(::Success)
-        .catch { emit(Error(it)) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+    private val _uiState: MutableStateFlow<SecurityUiState> =
+        MutableStateFlow(SecurityUiState.Initial)
+    val uiState: StateFlow<SecurityUiState> = _uiState
 
-    fun addSecurity(name: String) {
-        viewModelScope.launch {
-            securityRepository.add(name)
+
+    fun performLogin(email: String, password: String) {
+        _uiState.value = Loading
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, error ->
+            viewModelScope.launch(Dispatchers.Main) {
+                _uiState.value = Error(error)
+            }
+        }) {
+            securityRepository.login(LoginRequest(email = email, password = password))
+                .collect { apiResponse ->
+                    withContext(Dispatchers.Main) {
+                        if (apiResponse is ApiResponse.Success) {
+                            tokenManager.deleteToken()
+                            tokenManager.deleteRefreshToken()
+                            tokenManager.saveToken(apiResponse.data.data.attributes.accessToken)
+                            tokenManager.saveRefreshToken(apiResponse.data.data.attributes.refreshToken)
+                            _uiState.value = Success
+                        } else if (apiResponse is ApiResponse.Failure) {
+                            _uiState.value = Error(Exception(apiResponse.errorMessage))
+                        }
+                    }
+                }
         }
+    }
+
+    fun onErrorHandler() {
+        _uiState.value = SecurityUiState.Initial
     }
 }
 
 sealed interface SecurityUiState {
-    object Loading : SecurityUiState
+    data object Initial : SecurityUiState
+    data object Loading : SecurityUiState
     data class Error(val throwable: Throwable) : SecurityUiState
-    data class Success(val data: List<String>) : SecurityUiState
+    data object Success : SecurityUiState
 }
