@@ -127,10 +127,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
-    // Compose material 3 pullrefresh
+    // Compose material 3 pull-refresh
     implementation(libs.pullrefresh)
 
-    // Compose coild library to load image from url
+    // Compose Coild library to load image from url
     implementation(libs.coil.compose)
 
     // Tooling
@@ -142,7 +142,9 @@ dependencies {
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
-
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.core.testing)
     // Instrumented tests: jUnit rules and runners
 
     androidTestImplementation(libs.androidx.test.core)

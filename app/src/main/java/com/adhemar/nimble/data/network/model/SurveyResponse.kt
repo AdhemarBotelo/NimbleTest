@@ -27,9 +27,6 @@ data class SurveyAttribute(
     @SerializedName("description") val description: String,
     @SerializedName("is_active") val isActive: Boolean,
     @SerializedName("cover_image_url") val coverImageUrl: String,
-    @SerializedName("created_at") val createdAt: Date?,
-    @SerializedName("active_at") val activeAt: Date?,
-    @SerializedName("inactive_at") val inactiveAt: Date?,
     @SerializedName("survey_type") val surveyType: String
 )
 

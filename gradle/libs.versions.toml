@@ -22,6 +22,9 @@ ksp = "1.9.10-1.0.13"
 pullRefresh = "1.0.0"
 retrofit = "2.9.0"
 coilCompose = "2.5.0"
+mockk = "1.13.8"
+turbine = "1.0.0"
+coreTesting = "2.1.0"
 
 
 
@@ -60,6 +63,9 @@ datastore = { module = "androidx.datastore:datastore", version.ref = "dataStore"
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStorePreference" }
 pullrefresh = { module = "eu.bambooapps:compose-material3-pullrefresh", version.ref = "pullRefresh" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

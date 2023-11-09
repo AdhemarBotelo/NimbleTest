@@ -47,9 +47,9 @@ class SecurityViewModel @Inject constructor(
 
     fun performLogin(email: String, password: String) {
         _uiState.value = Loading
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, error ->
+        viewModelScope.launch(CoroutineExceptionHandler { _, error ->
             viewModelScope.launch(Dispatchers.Main) {
-                _uiState.value = Error(error)
+                _uiState.value = Error(Exception(error))
             }
         }) {
             securityRepository.login(LoginRequest(email = email, password = password))
@@ -77,6 +77,6 @@ class SecurityViewModel @Inject constructor(
 sealed interface SecurityUiState {
     data object Initial : SecurityUiState
     data object Loading : SecurityUiState
-    data class Error(val throwable: Throwable) : SecurityUiState
+    data class Error(val throwable: Exception) : SecurityUiState
     data object Success : SecurityUiState
 }
