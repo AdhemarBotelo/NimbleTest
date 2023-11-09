@@ -1,5 +1,6 @@
 package com.adhemar.nimble.data.network.model
 
+import com.adhemar.nimble.data.local.database.SurveyDB
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
@@ -31,3 +32,11 @@ data class SurveyAttribute(
     @SerializedName("inactive_at") val inactiveAt: Date?,
     @SerializedName("survey_type") val surveyType: String
 )
+
+fun Survey.toSurveyDB() =
+    SurveyDB(
+        title = attributes.title,
+        id = id,
+        description = attributes.description,
+        backgroundImageUrl = attributes.coverImageUrl
+    )

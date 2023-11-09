@@ -16,19 +16,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.adhemar.nimble.R
+import com.adhemar.nimble.data.SurveyRepository
+import com.adhemar.nimble.ui.home.HomeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
-    LaunchedEffect(true){
-        delay(2000) // todo replace with a operation if needed
+fun SplashScreen(navController: NavHostController, surveyRepository: SurveyRepository? = null) {
+    LaunchedEffect(true) {
+        surveyRepository?.getSurveys()
         navController.popBackStack()
-        val userLogged = false
-        if(userLogged){
-            navController.navigate(AppScreens.MainScreen.route)
-        }else {
-            navController.navigate(AppScreens.LoginScreen.route)
-        }
+        navController.navigate(AppScreens.LoginScreen.route)
 
     }
     Splash()
@@ -59,8 +56,8 @@ fun Splash() {
     }
 }
 
-@Preview ( showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun SplashScreenPreview(){
+fun SplashScreenPreview() {
     Splash()
 }

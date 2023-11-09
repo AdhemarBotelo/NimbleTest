@@ -16,20 +16,22 @@
 
 package com.adhemar.nimble.data.local.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Entity
 data class SurveyDB(
-    val title: String,
+    @ColumnInfo(name = "title") val title: String,
     @PrimaryKey val id: String,
-    val description:String,
-    val backgroundImageUrl:String
+    @ColumnInfo(name = "description") val description: String,
+    @ColumnInfo(name = "background_image_url") val backgroundImageUrl: String
 ) {
 
 }
@@ -37,10 +39,10 @@ data class SurveyDB(
 @Dao
 interface SurveyDao {
     @Query("SELECT * FROM SurveyDB ORDER BY id")
-    fun getSurveys(): Flow<List<SurveyDB>>
+    suspend fun getSurveys(): List<SurveyDB>
 
-    @Insert
-    suspend fun insertSurvey(item: SurveyDB)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSurvey(surveys: List<SurveyDB>)
 
     @Query("DELETE FROM SurveyDB")
     suspend fun deleteAllSurvey()

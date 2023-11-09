@@ -19,9 +19,12 @@ package com.adhemar.nimble.ui
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.adhemar.nimble.ui.detailsurvey.DetailSurveyScreen
 import com.adhemar.nimble.ui.home.HomeScreen
 import com.adhemar.nimble.ui.home.HomeViewModel
 import com.adhemar.nimble.ui.security.SecurityScreen
@@ -32,14 +35,22 @@ fun MainNavigation(context: Context) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
-        composable(AppScreens.SplashScreen.route) { SplashScreen(navController) }
+        composable(AppScreens.SplashScreen.route) {
+            SplashScreen(navController)
+        }
         composable(AppScreens.MainScreen.route) {
-            val viewModel:HomeViewModel = hiltViewModel()
-            (HomeScreen(navController, viewModel =viewModel , context = context))
+            val viewModel: HomeViewModel = hiltViewModel()
+            (HomeScreen(navController, viewModel = viewModel))
         }
         composable(AppScreens.LoginScreen.route) {
             val viewModel: SecurityViewModel = hiltViewModel()
             SecurityScreen(viewModel, navController, context)
+        }
+        composable(
+            AppScreens.DetailSurvey.route,
+            arguments = listOf(navArgument("surveyId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            DetailSurveyScreen(navController, backStackEntry.arguments?.getString("surveyId"))
         }
     }
 }
@@ -47,5 +58,6 @@ fun MainNavigation(context: Context) {
 sealed class AppScreens(val route: String) {
     data object SplashScreen : AppScreens("splash_screen")
     data object MainScreen : AppScreens("main_screen")
+    data object DetailSurvey : AppScreens("detail_survey/{surveyId}")
     data object LoginScreen : AppScreens("login_screen")
 }

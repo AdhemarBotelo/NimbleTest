@@ -27,6 +27,7 @@ import com.adhemar.nimble.data.network.model.LoginRequest
 import com.adhemar.nimble.data.network.model.OauthToken
 import com.adhemar.nimble.data.network.model.OauthTokenAtribute
 import com.adhemar.nimble.data.network.model.RefreshTokenRequest
+import com.adhemar.nimble.data.network.model.Survey
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -99,12 +100,11 @@ class FakeSecurityRepository @Inject constructor() : SecurityRepository {
 }
 
 class FakeSurveryRepository @Inject constructor(): ISurveyRepository {
-    override fun getSurveys(coroutineScope: CoroutineScope): Flow<ApiResponse<Boolean>> {
+    override suspend fun getSurveys(): List<SurveyDB> {
         TODO("Not yet implemented")
     }
 
-
-    override fun getSurveysFromDB(): Flow<List<SurveyDB>> {
+    override suspend fun getSurveysFromDB(): List<SurveyDB> {
         TODO("Not yet implemented")
     }
 
