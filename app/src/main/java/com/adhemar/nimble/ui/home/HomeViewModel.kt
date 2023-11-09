@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
 
     fun loadSurveys() {
         _uiState.value = HomeUiState.Loading
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, error ->
+        viewModelScope.launch(CoroutineExceptionHandler { _, error ->
             viewModelScope.launch(Dispatchers.Main) {
                 _uiState.value = HomeUiState.Error(error)
             }
@@ -40,7 +40,7 @@ class HomeViewModel @Inject constructor(
 
     fun tryAgain() {
         _uiState.value = HomeUiState.Loading
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, error ->
+        viewModelScope.launch(CoroutineExceptionHandler { _, error ->
             viewModelScope.launch(Dispatchers.Main) {
                 _uiState.value = HomeUiState.Error(error)
             }
