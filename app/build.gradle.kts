@@ -127,6 +127,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
+    // Compose material 3 pullrefresh
+    implementation(libs.pullrefresh)
+
+    // Compose coild library to load image from url
+    implementation(libs.coil.compose)
+
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Instrumented tests

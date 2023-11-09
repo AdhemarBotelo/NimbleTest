@@ -11,15 +11,19 @@ androidxRoom = "2.6.0"
 androidxTest = "1.5.0"
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
+converterGson = "2.9.0"
 coroutines = "1.7.3"
+dataStore = "1.0.0"
+dataStorePreference = "1.0.0"
 hilt = "2.48.1"
 junit = "4.13.2"
 kotlin = "1.9.10"
 ksp = "1.9.10-1.0.13"
+pullRefresh = "1.0.0"
 retrofit = "2.9.0"
-converterGson = "2.9.0"
-dataStore = "1.0.0"
-dataStorePreference = "1.0.0"
+coilCompose = "2.5.0"
+
+
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -54,6 +58,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 datastore = { module = "androidx.datastore:datastore", version.ref = "dataStore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStorePreference" }
+pullrefresh = { module = "eu.bambooapps:compose-material3-pullrefresh", version.ref = "pullRefresh" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

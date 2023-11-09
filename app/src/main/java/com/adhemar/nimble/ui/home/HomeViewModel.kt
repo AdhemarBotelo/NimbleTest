@@ -2,21 +2,19 @@ package com.adhemar.nimble.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.adhemar.nimble.data.SurveyRepository
+import com.adhemar.nimble.data.ISurveyRepository
 import com.adhemar.nimble.data.local.database.SurveyDB
-import com.adhemar.nimble.data.network.ApiResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val surveyRepository: SurveyRepository
+    private val surveyRepository: ISurveyRepository
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<HomeUiState> =
         MutableStateFlow(HomeUiState.Initial)
@@ -29,16 +27,14 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = HomeUiState.Error(error)
             }
         }) {
-            surveyRepository.getSurveysFromDB()
-                .collect { listSurveys ->
-                    withContext(Dispatchers.Main) {
-                        if (listSurveys.isNotEmpty()) {
-                            _uiState.value = HomeUiState.Success(listSurveys)
-                        } else {
-                            _uiState.value = HomeUiState.Error(Exception("There is no Surveys"))
-                        }
-                    }
-                }
+            val surveys = surveyRepository.getSurveysFromDB()
+            if (surveys.isEmpty()) {
+                _uiState.value = HomeUiState.Error(Exception("There is no Surveys"))
+
+            } else {
+                _uiState.value = HomeUiState.Success(surveys)
+            }
+
         }
     }
 
@@ -49,14 +45,13 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = HomeUiState.Error(error)
             }
         }) {
-            surveyRepository.getSurveys(viewModelScope)
-                .collect { apiResponse ->
-                    withContext(Dispatchers.Main) {
-                        if (apiResponse is ApiResponse.Success) {
-                            loadSurveys()
-                        }
-                    }
-                }
+            val surveys = surveyRepository.getSurveys()
+            if (surveys.isEmpty()) {
+                _uiState.value = HomeUiState.Error(Exception("There is no Surveys"))
+
+            } else {
+                _uiState.value = HomeUiState.Success(surveys)
+            }
         }
     }
 
