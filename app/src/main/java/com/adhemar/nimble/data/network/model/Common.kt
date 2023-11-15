@@ -5,9 +5,6 @@ enum class GranType(val value:String) {
     RefreshToken("refresh_token")
 }
 
-const val CLIENT_ID = "ofzl-2h5ympKa0WqqTzqlVJUiRsxmXQmt5tkgrlWnOE"
-const val CLIENT_SECRET= "lMQb900L-mTeU-FVTCwyhjsfBwRCxwwbCitPob96cuU"
-
 data class ErrorResponse(
     val code:Int,
     val message:String
