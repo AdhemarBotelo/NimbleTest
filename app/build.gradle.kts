@@ -16,6 +16,8 @@ import com.android.build.api.dsl.Packaging
  * limitations under the License.
  */
 
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.android.application)
@@ -23,6 +25,17 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
+}
+
+fun getAPIProperty(propertyName: String): String? {
+    val props = Properties()
+    val propsFile = rootProject.file("api.properties")
+
+    if (propsFile.exists()) {
+        propsFile.inputStream().use { props.load(it) }
+    }
+
+    return props.getProperty(propertyName)
 }
 
 android {
@@ -50,7 +63,16 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "CLIENT_ID", "${getAPIProperty("CLIENT_ID")}")
+            buildConfigField("String", "CLIENT_SECRET", "${getAPIProperty("CLIENT_SECRET")}")
+        }
+        getByName("debug") {
+            buildConfigField("String", "CLIENT_ID", "${getAPIProperty("CLIENT_ID")}")
+            buildConfigField("String", "CLIENT_SECRET", "${getAPIProperty("CLIENT_SECRET")}")
         }
     }
 
@@ -69,18 +91,17 @@ android {
         buildConfig = false
         renderScript = false
         shaders = false
+        buildConfig = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
-    fun Packaging.() {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+
 }
+
+
 
 dependencies {
 
