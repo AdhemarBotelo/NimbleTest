@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,13 +60,20 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 
 
+const val HomeTag = "HomeTag"
+const val ListSurveyTag = "ListSurveyTag"
+
 @Composable
 fun HomeScreen(navHostController: NavHostController, viewModel: HomeViewModel) {
     LaunchedEffect(Unit) {
         viewModel.loadSurveys()
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(HomeTag)
+    ) {
         ScreenHome(
             uiState = viewModel.uiState.collectAsStateWithLifecycle(
                 lifecycleOwner = LocalLifecycleOwner.current
@@ -93,30 +101,35 @@ fun ScreenHome(
     when (uiState.value) {
         is HomeUiState.Success -> {
             LazyRow(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag(ListSurveyTag),
             ) {
-                val surveys = (uiState.value as HomeUiState.Success).surveys
-                itemsIndexed(surveys) { index, survey ->
-                    Box(
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .background(Color.Blue)
-                    ) {
-                        AsyncImage(
-                            model = survey.backgroundImageUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillParentMaxSize(),
-                        )
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Header()
-                            Footer(survey.title, survey.description, {
-                                gotoDetailSurveyScreen(survey.id)
-                            }, surveys.size, index)
+                val surveys = (uiState.value as? HomeUiState.Success)?.surveys
+                surveys?.let {
+                    itemsIndexed(surveys) { index, survey ->
+                        Box(
+                            modifier = Modifier
+                                .fillParentMaxWidth()
+                                .background(Color.Blue)
+                        ) {
+                            AsyncImage(
+                                model = survey.backgroundImageUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillParentMaxSize(),
+                            )
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                Header()
+                                Footer(survey.title, survey.description, {
+                                    gotoDetailSurveyScreen(survey.id)
+                                }, surveys.size, index)
+                            }
                         }
-                    }
 
+                    }
                 }
+
             }
         }
 
@@ -240,15 +253,13 @@ fun CircularImage(modifier: Modifier, onClick: () -> Unit) {
             .background(Color.White)
             .clickable { onClick() }
     ) {
-        // Replace 'R.drawable.your_image' with the image you want to display
         val imagePainter = painterResource(id = R.drawable.ic_next_24)
-
         Image(
             painter = imagePainter,
-            contentDescription = null, // Provide content description if needed
+            contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(4.dp) // Adjust the padding as needed
+                .padding(4.dp)
         )
     }
 }
@@ -314,7 +325,7 @@ fun HeaderPreview() {
 @Preview(showBackground = true)
 @Composable
 fun PagePreview() {
-    var stateUI: MutableState<HomeUiState> = remember {
+    val stateUI: MutableState<HomeUiState> = remember {
         mutableStateOf(
             HomeUiState.Success(
                 listOf(

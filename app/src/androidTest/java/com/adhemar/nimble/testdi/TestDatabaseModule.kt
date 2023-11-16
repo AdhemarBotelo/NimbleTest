@@ -16,13 +16,17 @@
 
 package com.adhemar.nimble.testdi
 
+import com.adhemar.nimble.data.ISurveyRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import com.adhemar.nimble.data.SecurityRepository
+import com.adhemar.nimble.data.SurveyRepository
 import com.adhemar.nimble.data.di.DataModule
 import com.adhemar.nimble.data.di.FakeSecurityRepository
+import com.adhemar.nimble.data.di.FakeSurveyRepository
+import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
@@ -32,7 +36,13 @@ import com.adhemar.nimble.data.di.FakeSecurityRepository
 interface FakeDataModule {
 
     @Binds
-    abstract fun bindRepository(
+    abstract fun bindsSecurityRepository(
         fakeRepository: FakeSecurityRepository
     ): SecurityRepository
+
+
+    @Binds
+    abstract fun bindSurveyRepository(
+        fakeRepository: FakeSurveyRepository
+    ): ISurveyRepository
 }

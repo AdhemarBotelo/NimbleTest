@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -98,6 +99,9 @@ fun SecurityScreen(
         }) { viewModel.onErrorHandler() }
 }
 
+const val LoginTag = "LoginTag"
+const val LoginButtonTag = "LoginButtonTag"
+
 @Composable
 fun Login(
     context: Context,
@@ -109,7 +113,11 @@ fun Login(
     if (uiState.value == SecurityUiState.Success) {
         goToMainScreen()
     }
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(LoginTag)
+    ) {
         Image(
             painter = painterResource(id = R.drawable.ic_background),
             contentDescription = null,
@@ -168,7 +176,8 @@ fun Login(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .background(Color.Black),
+                            .background(Color.Black)
+                            .testTag(LoginButtonTag),
                         colors = ButtonDefaults.buttonColors(Color.White),
                         enabled = uiState.value != SecurityUiState.Loading
 

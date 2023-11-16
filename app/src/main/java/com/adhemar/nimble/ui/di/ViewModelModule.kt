@@ -1,7 +1,9 @@
 package com.adhemar.nimble.ui.di
 
+import com.adhemar.nimble.data.ISurveyRepository
 import com.adhemar.nimble.data.SecurityRepository
 import com.adhemar.nimble.data.SurveyRepository
+import com.adhemar.nimble.data.network.ITokenManager
 import com.adhemar.nimble.data.network.TokenManager
 import com.adhemar.nimble.ui.home.HomeViewModel
 import com.adhemar.nimble.ui.security.SecurityViewModel
@@ -17,14 +19,14 @@ object ViewModelModule {
     @Provides
     fun provideSecurityViewModel(
         securityRepository: SecurityRepository,
-        tokenManager: TokenManager,
+        tokenManager: ITokenManager,
     ): SecurityViewModel{
         return SecurityViewModel(securityRepository,tokenManager)
     }
 
     @Provides
     fun provideHomeViewModel(
-        surveyRepository: SurveyRepository
+        surveyRepository: ISurveyRepository
     ):HomeViewModel {
         return HomeViewModel(surveyRepository)
     }

@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adhemar.nimble.data.SecurityRepository
 import com.adhemar.nimble.data.network.ApiResponse
+import com.adhemar.nimble.data.network.ITokenManager
 import com.adhemar.nimble.data.network.TokenManager
 import com.adhemar.nimble.data.network.model.LoginRequest
 import com.adhemar.nimble.ui.security.SecurityUiState.Error
@@ -37,7 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SecurityViewModel @Inject constructor(
     private val securityRepository: SecurityRepository,
-    private val tokenManager: TokenManager,
+    private val tokenManager: ITokenManager,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SecurityUiState> =
@@ -56,11 +57,11 @@ class SecurityViewModel @Inject constructor(
                 .collect { apiResponse ->
                     withContext(Dispatchers.Main) {
                         if (apiResponse is ApiResponse.Success) {
+                            _uiState.value = Success
                             tokenManager.deleteToken()
                             tokenManager.deleteRefreshToken()
                             tokenManager.saveToken(apiResponse.data.data.attributes.accessToken)
                             tokenManager.saveRefreshToken(apiResponse.data.data.attributes.refreshToken)
-                            _uiState.value = Success
                         } else if (apiResponse is ApiResponse.Failure) {
                             _uiState.value = Error(Exception(apiResponse.errorMessage))
                         }

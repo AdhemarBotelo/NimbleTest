@@ -16,11 +16,23 @@
 
 package com.adhemar.nimble.ui.security
 
-import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.adhemar.nimble.ui.AppScreens
+import com.adhemar.nimble.ui.MainActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,23 +41,50 @@ import org.junit.runner.RunWith
 /**
  * UI tests for [SecurityScreen].
  */
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class SecurityScreenTest {
 
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule(order = 0)
+    var hiltTestRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    private lateinit var navController: TestNavHostController
+    private lateinit var viewModel: SecurityViewModel
 
     @Before
     fun setup() {
-        composeTestRule.setContent {
-            SecurityScreen(FAKE_DATA, onSave = {})
+        hiltTestRule.inject()
+        composeTestRule.activity.setContent {
+            navController = TestNavHostController(LocalContext.current)
+            navController.navigatorProvider.addNavigator(ComposeNavigator())
+            viewModel = hiltViewModel()
+            SecurityScreen(
+                viewModel = viewModel,
+                navController,
+                LocalContext.current
+            )
         }
     }
 
     @Test
-    fun firstItem_exists() {
-        composeTestRule.onNodeWithText(FAKE_DATA.first()).assertExists().performClick()
+    fun userSeeLoginScreen() {
+        composeTestRule.onNodeWithTag(LoginTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(LoginButtonTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun userClickLoginSeeHomeScreen() {
+        composeTestRule.onNodeWithTag(LoginButtonTag).assertIsEnabled()
+        composeTestRule.onNodeWithTag(LoginButtonTag).performClick()
+
+    }
+
+    fun NavController.assertCurrentRouteName(expectedRouteName: String) {
+        Assert.assertEquals(expectedRouteName, currentBackStackEntry?.destination?.route)
     }
 }
 
-private val FAKE_DATA = listOf("Compose", "Room", "Kotlin")
+
