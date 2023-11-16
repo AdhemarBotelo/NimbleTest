@@ -1,5 +1,7 @@
-# NimbleTest
-Survey App
+# NimbleTest configuration
+clone the repository then create a file api.properties in the root of project add the following properties
+CLIENT_ID = "here your client ID"
+CLIENT_SECRET = "here your client secret"
 
 # Application features
 #Authentication:
