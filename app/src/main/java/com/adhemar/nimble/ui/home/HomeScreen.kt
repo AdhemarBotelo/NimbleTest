@@ -111,7 +111,7 @@ fun ScreenHome(
                         Box(
                             modifier = Modifier
                                 .fillParentMaxWidth()
-                                .background(Color.Blue)
+                                .background(Color.Black)
                         ) {
                             AsyncImage(
                                 model = survey.backgroundImageUrl,
@@ -166,7 +166,7 @@ fun ScreenHome(
         is HomeUiState.Loading -> {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(
-                    color = Color.Black,
+                    color = Color.White,
                     modifier = Modifier
                         .size(64.dp)
                         .padding(4.dp)
@@ -176,7 +176,15 @@ fun ScreenHome(
         }
 
         HomeUiState.Initial -> {
-            //no-op
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(4.dp)
+                        .align(Alignment.Center)
+                )
+            }
         }
     }
 }

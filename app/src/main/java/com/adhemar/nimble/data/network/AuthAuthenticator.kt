@@ -21,10 +21,6 @@ class AuthAuthenticator @Inject constructor(
         }
         return runBlocking {
             val newToken = getNewToken(refreshToken)
-            if (!newToken.isSuccessful || newToken.body() == null) {
-                tokenManager.deleteToken()
-                tokenManager.deleteRefreshToken()
-            }
             newToken.body()?.let {
                 tokenManager.saveToken(it.data.attributes.accessToken)
                 tokenManager.saveRefreshToken(it.data.attributes.refreshToken)

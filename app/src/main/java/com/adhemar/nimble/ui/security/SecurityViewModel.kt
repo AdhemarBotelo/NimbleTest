@@ -57,11 +57,9 @@ class SecurityViewModel @Inject constructor(
                 .collect { apiResponse ->
                     withContext(Dispatchers.Main) {
                         if (apiResponse is ApiResponse.Success) {
-                            _uiState.value = Success
-                            tokenManager.deleteToken()
-                            tokenManager.deleteRefreshToken()
                             tokenManager.saveToken(apiResponse.data.data.attributes.accessToken)
                             tokenManager.saveRefreshToken(apiResponse.data.data.attributes.refreshToken)
+                            _uiState.value = Success
                         } else if (apiResponse is ApiResponse.Failure) {
                             _uiState.value = Error(Exception(apiResponse.errorMessage))
                         }
