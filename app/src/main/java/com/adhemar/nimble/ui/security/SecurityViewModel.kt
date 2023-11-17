@@ -57,14 +57,30 @@ class SecurityViewModel @Inject constructor(
                 .collect { apiResponse ->
                     withContext(Dispatchers.Main) {
                         if (apiResponse is ApiResponse.Success) {
-                            tokenManager.saveToken(apiResponse.data.data.attributes.accessToken)
-                            tokenManager.saveRefreshToken(apiResponse.data.data.attributes.refreshToken)
+                            saveToken(
+                                apiResponse.data.data.attributes.accessToken,
+                                apiResponse.data.data.attributes.refreshToken,
+                            )
                             _uiState.value = Success
                         } else if (apiResponse is ApiResponse.Failure) {
                             _uiState.value = Error(Exception(apiResponse.errorMessage))
                         }
                     }
                 }
+        }
+    }
+
+    private fun saveToken(accessToken: String, refreshToken: String) {
+        viewModelScope.launch(Dispatchers.Main) {
+            try {
+                withContext(Dispatchers.IO) {
+                    tokenManager.saveToken(accessToken)
+                    tokenManager.saveRefreshToken(refreshToken)
+                    tokenManager.saveLoginStatus(true)
+                }
+            } catch (err: Exception) {
+                err.printStackTrace()
+            }
         }
     }
 

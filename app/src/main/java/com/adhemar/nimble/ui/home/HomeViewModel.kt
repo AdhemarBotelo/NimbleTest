@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adhemar.nimble.data.ISurveyRepository
 import com.adhemar.nimble.data.local.database.SurveyDB
+import com.adhemar.nimble.data.network.ITokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val surveyRepository: ISurveyRepository
+    private val surveyRepository: ISurveyRepository,
+    private val tokenManager: ITokenManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<HomeUiState> =
         MutableStateFlow(HomeUiState.Initial)
@@ -35,6 +37,17 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = HomeUiState.Success(surveys)
             }
 
+        }
+    }
+
+    fun logOut() {
+        viewModelScope.launch(CoroutineExceptionHandler { _, error ->
+            viewModelScope.launch(Dispatchers.Main) {
+                _uiState.value = HomeUiState.Error(Exception(error))
+            }
+        }) {
+            tokenManager.saveLoginStatus(false)
+            tokenManager.deleteTokens()
         }
     }
 

@@ -26,6 +26,7 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("access_token")
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token_key")
+        private val IS_LOGGED_KEY = stringPreferencesKey("is_logged key")
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -34,15 +35,20 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
 
     override fun getToken(): Flow<String?> {
         val file = File(context.filesDir, TOKEN_FILE)
+
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             flow {
-                emit(
-                    withContext(Dispatchers.IO) {
+                if (file.exists()) {
+                    emit(
                         cryptoManager.decrypt(
                             inputStream = FileInputStream(file)
                         )
-                    }.decodeToString()
-                )
+                            .decodeToString()
+                    )
+                } else {
+                    emit("")
+                }
+
             }
         } else {
             context.dataStore.data.map { preferences ->
@@ -56,16 +62,12 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
             val bytes = token.encodeToByteArray()
             val file = File(context.filesDir, TOKEN_FILE)
             if (!file.exists()) {
-                withContext(Dispatchers.IO) {
-                    file.createNewFile()
-                }
+                file.createNewFile()
             }
-            val fos = withContext(Dispatchers.IO) {
-                FileOutputStream(file)
-            }
+            val fos = FileOutputStream(file)
+
             cryptoManager.encrypt(
-                bytes = bytes,
-                outputStream = fos
+                bytes = bytes, outputStream = fos
             ).decodeToString()
         } else {
             context.dataStore.edit { preferences ->
@@ -74,28 +76,19 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
         }
     }
 
-    override suspend fun deleteToken() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val file = File(context.filesDir, TOKEN_FILE)
-            file.delete()
-        } else {
-            context.dataStore.edit { preferences ->
-                preferences.remove(TOKEN_KEY)
-            }
-        }
-    }
-
     override fun getRefreshToken(): Flow<String?> {
         val file = File(context.filesDir, REFRESH_TOKEN_FILE)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             flow {
-                emit(
-                    withContext(Dispatchers.IO) {
+                if (file.exists()) {
+                    emit(
                         cryptoManager.decrypt(
                             inputStream = FileInputStream(file)
-                        )
-                    }.decodeToString()
-                )
+                        ).decodeToString()
+                    )
+                } else {
+                    emit("")
+                }
             }
         } else {
             context.dataStore.data.map { preferences ->
@@ -110,15 +103,10 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
             val bytes = token.encodeToByteArray()
             val file = File(context.filesDir, REFRESH_TOKEN_FILE)
             if (!file.exists()) {
-                withContext(Dispatchers.IO) {
-                    file.createNewFile()
-                }
-                val fos = withContext(Dispatchers.IO) {
-                    FileOutputStream(file)
-                }
+                file.createNewFile()
+                val fos = FileOutputStream(file)
                 cryptoManager.encrypt(
-                    bytes = bytes,
-                    outputStream = fos
+                    bytes = bytes, outputStream = fos
                 ).decodeToString()
             }
         } else {
@@ -128,15 +116,22 @@ class TokenManager @Inject constructor(private val context: Context) : ITokenMan
         }
     }
 
-    override suspend fun deleteRefreshToken() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val file = File(context.filesDir, REFRESH_TOKEN_FILE)
-            file.delete()
-        } else {
-            context.dataStore.edit { preferences ->
-                preferences.remove(REFRESH_TOKEN_KEY)
-            }
+    override suspend fun saveLoginStatus(isLogged: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[IS_LOGGED_KEY] = isLogged.toString()
         }
+    }
+
+    override suspend fun getLoginStatus(): Flow<Boolean> {
+        return context.dataStore.data.map { preference ->
+            preference[IS_LOGGED_KEY].toBoolean()
+        }
+    }
+
+    override suspend fun deleteTokens() {
+        val file = File(context.filesDir, TOKEN_FILE)
+        val fileRefresh = File(context.filesDir, TOKEN_FILE)
+        file.deleteOnExit()
+        fileRefresh.deleteOnExit()
     }
 }

@@ -15,12 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,8 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +57,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.adhemar.nimble.R
 import com.adhemar.nimble.data.local.database.SurveyDB
+import com.adhemar.nimble.ui.AppScreens
 import eu.bambooapps.material3.pullrefresh.PullRefreshIndicator
 import eu.bambooapps.material3.pullrefresh.pullRefresh
 import eu.bambooapps.material3.pullrefresh.rememberPullRefreshState
@@ -79,8 +86,13 @@ fun HomeScreen(navHostController: NavHostController, viewModel: HomeViewModel) {
                 lifecycleOwner = LocalLifecycleOwner.current
             ),
             { viewModel.tryAgain() },
-            { viewModel.onErrorHandler() }
-        ) { surveyId -> navHostController.navigate("detail_survey/$surveyId") }
+            { viewModel.onErrorHandler() },
+            { surveyId -> navHostController.navigate("detail_survey/$surveyId") }
+        ) {
+            viewModel.logOut()
+            navHostController.popBackStack()
+            navHostController.navigate(AppScreens.LoginScreen.route)
+        }
     }
 }
 
@@ -91,6 +103,7 @@ fun ScreenHome(
     tryAgain: () -> Unit,
     onErrorHandler: () -> Unit,
     gotoDetailSurveyScreen: (idSurvey: String) -> Unit,
+    onLogOut: () -> Unit,
 ) {
     val pullRefreshState =
         rememberPullRefreshState(uiState.value is HomeUiState.Loading, {
@@ -120,7 +133,7 @@ fun ScreenHome(
                                 modifier = Modifier.fillParentMaxSize(),
                             )
                             Column(modifier = Modifier.fillMaxSize()) {
-                                Header()
+                                Header(onLogOut)
                                 Footer(survey.title, survey.description, {
                                     gotoDetailSurveyScreen(survey.id)
                                 }, surveys.size, index)
@@ -254,6 +267,7 @@ fun Footer(
 
 @Composable
 fun CircularImage(modifier: Modifier, onClick: () -> Unit) {
+
     Box(
         modifier = modifier
             .size(56.dp)
@@ -273,12 +287,19 @@ fun CircularImage(modifier: Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-fun Header() {
+fun Header(onLogOut: () -> Unit) {
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    val items = listOf("Log-out")
     val stringDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM dd"))
     } else {
         SimpleDateFormat("EEEE, MMMM dd").format(Date())
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -302,23 +323,53 @@ fun Header() {
                 )
             )
         }
-        Image(painter = painterResource(id = R.drawable.ic_user),
-            contentDescription = stringResource(
-                R.string.log_out
-            ),
-            modifier = Modifier
-                .height(30.dp)
-                .width(30.dp)
-                .layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    layout(placeable.width, placeable.height) {
-                        placeable.place(constraints.maxWidth - placeable.width, 0)
+        Box(modifier = Modifier.wrapContentSize()) {
+            Image(painter = painterResource(id = R.drawable.ic_user),
+                contentDescription = stringResource(
+                    R.string.log_out
+                ),
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(30.dp)
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(constraints.maxWidth - placeable.width, 0)
+                        }
                     }
+                    .clickable {
+                        expanded = true
+                    }
+
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
+                    .align(Alignment.Center)
+            ) {
+                items.forEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedIndex = index
+                            expanded = false
+                            onLogOut()
+                        },
+                        text = {
+                            Text(
+                                item,
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold, fontSize = 16.sp
+                                )
+                            )
+                        }
+                    )
                 }
-
-        )
+            }
+        }
     }
-
 
 }
 
@@ -327,7 +378,7 @@ fun Header() {
 @Preview
 @Composable
 fun HeaderPreview() {
-    Header()
+    Header({})
 }
 
 @Preview(showBackground = true)
@@ -364,5 +415,5 @@ fun PagePreview() {
 //    }
 
 
-    ScreenHome(stateUI, {}, {}, { _ -> })
+    ScreenHome(stateUI, {}, {}, { _ -> }, {})
 }

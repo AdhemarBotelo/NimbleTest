@@ -78,6 +78,7 @@ class SecurityScreenTest {
     @Test
     fun userClickLoginSeeHomeScreen() {
         composeTestRule.onNodeWithTag(LoginButtonTag).assertIsEnabled()
+        composeTestRule.onNodeWithTag(LoginButtonTag).assertIsDisplayed()
         composeTestRule.onNodeWithTag(LoginButtonTag).performClick()
 
     }

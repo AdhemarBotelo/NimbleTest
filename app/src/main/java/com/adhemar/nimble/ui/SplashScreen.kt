@@ -11,24 +11,38 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.adhemar.nimble.R
-import com.adhemar.nimble.data.SurveyRepository
-import com.adhemar.nimble.ui.home.HomeViewModel
-import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavHostController, surveyRepository: SurveyRepository? = null) {
+fun SplashScreen(navController: NavHostController, viewModel: SplashViewModel) {
     LaunchedEffect(true) {
-        surveyRepository?.getSurveys()
-        navController.popBackStack()
-        navController.navigate(AppScreens.LoginScreen.route)
-
+        viewModel.getSurveys()
+        viewModel.isLogged()
     }
-    Splash()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle(
+        lifecycleOwner = LocalLifecycleOwner.current
+    )
+    when (uiState.value) {
+        SplashUiState.Initial -> {
+            Splash()
+        }
+
+        SplashUiState.IsLogged -> {
+            navController.popBackStack()
+            navController.navigate(AppScreens.MainScreen.route)
+        }
+
+        SplashUiState.NotLogged -> {
+            navController.popBackStack()
+            navController.navigate(AppScreens.LoginScreen.route)
+        }
+    }
 }
 
 @Composable

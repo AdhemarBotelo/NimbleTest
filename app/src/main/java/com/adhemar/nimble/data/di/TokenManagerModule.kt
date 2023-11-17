@@ -39,10 +39,6 @@ class FakeTokenManager @Inject constructor(private val context: Context) : IToke
 
     }
 
-    override suspend fun deleteToken() {
-
-    }
-
     override fun getRefreshToken(): Flow<String?> {
         return flow {
             emit("123412341234")
@@ -53,8 +49,17 @@ class FakeTokenManager @Inject constructor(private val context: Context) : IToke
 
     }
 
-    override suspend fun deleteRefreshToken() {
-
+    override suspend fun saveLoginStatus(isLogged: Boolean) {
+        TODO("Not yet implemented")
     }
 
+    override suspend fun getLoginStatus(): Flow<Boolean> {
+        return flow {
+            emit(true)
+        }
+    }
+
+    override suspend fun deleteTokens() {
+        TODO("Not yet implemented")
+    }
 }

@@ -36,7 +36,8 @@ fun MainNavigation(context: Context) {
 
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
         composable(AppScreens.SplashScreen.route) {
-            SplashScreen(navController)
+            val viewModel: SplashViewModel = hiltViewModel()
+            SplashScreen(navController, viewModel)
         }
         composable(AppScreens.MainScreen.route) {
             val viewModel: HomeViewModel = hiltViewModel()

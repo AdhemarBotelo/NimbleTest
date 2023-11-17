@@ -3,6 +3,7 @@ package com.adhemar.nimble.ui.home
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.adhemar.nimble.data.SurveyRepository
 import com.adhemar.nimble.data.local.database.SurveyDB
+import com.adhemar.nimble.data.network.TokenManager
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
@@ -23,6 +24,9 @@ class HomeViewModelTest {
     @RelaxedMockK
     private lateinit var surveyRepository: SurveyRepository
 
+    @RelaxedMockK
+    private lateinit var tokenManager: TokenManager
+
     private lateinit var homeViewModel: HomeViewModel
 
     @get:Rule
@@ -31,7 +35,7 @@ class HomeViewModelTest {
     @Before
     fun onBefore() {
         MockKAnnotations.init(this)
-        homeViewModel = HomeViewModel(surveyRepository)
+        homeViewModel = HomeViewModel(surveyRepository, tokenManager)
         Dispatchers.setMain(Dispatchers.Unconfined)
     }
 

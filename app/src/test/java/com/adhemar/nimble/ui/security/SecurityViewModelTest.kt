@@ -41,8 +41,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import java.lang.Exception
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -122,8 +120,6 @@ class SecurityViewModelTest {
 
 
             //Then
-            coVerify(exactly = 1) { tokenManager.deleteToken() }
-            coVerify(exactly = 1) { tokenManager.deleteRefreshToken() }
             coVerify(exactly = 1) { tokenManager.saveToken(any()) }
             coVerify(exactly = 1) { tokenManager.saveRefreshToken(any()) }
             assertEquals(securityViewModel.uiState.value, SecurityUiState.Success)
